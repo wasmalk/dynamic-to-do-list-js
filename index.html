@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>To-Do List Application</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const addButton = document.getElementById('add-task-btn');
+            const taskInput = document.getElementById('task-input');
+            const taskList = document.getElementById('task-list');
+
+            // Initialize tasks array
+            let tasks = [];
+
+            // Load tasks from Local Storage
+            function loadTasks() {
+                const storedTasks = localStorage.getItem('tasks');
+                if (storedTasks) {
+                    tasks = JSON.parse(storedTasks);
+                    tasks.forEach(taskText => {
+                        addTaskToDOM(taskText); // Add each task to the DOM
+                    });
+                }
+            }
+
+            // Function to create a task element and append to the DOM
+            function addTaskToDOM(taskText) {
+                const li = document.createElement('li');
+                li.textContent = taskText;
+
+                const removeButton = document.createElement('button');
+                removeButton.textContent = "Remove";
+                removeButton.className = 'remove-btn';
+
+                removeButton.onclick = () => {
+                    removeTask(taskText, li); // Remove task from DOM and array
+                };
+
+                li.appendChild(removeButton);
+                taskList.appendChild(li);
+            }
+
+            // Add Task function
+            function addTask() {
+                const taskText = taskInput.value.trim();
+                if (taskText === "") {
+                    alert("Please enter a task.");
+                    return;
+                }
+
+                // Add task to the array and Local Storage
+                tasks.push(taskText);
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                addTaskToDOM(taskText); // Add task to the DOM
+                taskInput.value = ''; // Clear input field
+            }
+
+            // Remove Task function
+            function removeTask(taskText, li) {
+                tasks = tasks.filter(task => task !== taskText); // Remove from array
+                localStorage.setItem('tasks', JSON.stringify(tasks)); // Update Local Storage
+                taskList.removeChild(li); // Remove from DOM
+            }
+
+            // Attach Event Listeners
+            addButton.addEventListener('click', addTask);
+            taskInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    addTask();
+                }
+            });
+
+            // Load tasks when the page loads
+            loadTasks();
+        });
+    </script>
+</head>
+<body>
+    <div id="todo-app">
+        <h1>My To-Do List</h1>
+        <input type="text" id="task-input" placeholder="Enter a new task">
+        <button id="add-task-btn">Add Task</button>
+        <ul id="task-list">
+            <!-- Tasks will be listed here -->
+        </ul>
+    </div>
+</body>
+</html>
